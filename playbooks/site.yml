@@ -1,0 +1,11 @@
+---
+# Convenience umbrella for a single "apply everything" Semaphore template.
+# Each piece also works perfectly well as its own template -- see
+# README.md for why you will often want them separate (different
+# schedules, different blast radius, different approval requirements).
+
+- name: Apply admin user accounts
+  ansible.builtin.import_playbook: users.yml
+
+- name: Apply the demo webserver
+  ansible.builtin.import_playbook: webserver.yml

@@ -1,0 +1,13 @@
+---
+# NOTE: confirm which privilege-escalation group your openSUSE image
+# actually wires up in /etc/sudoers (or /etc/sudoers.d/*) -- some images
+# ship with %wheel pre-enabled, others don't enable any group at all.
+# Adjust this value to match reality before running playbooks/users.yml.
+admin_users_sudo_group: wheel
+
+# Default nginx web root shipped by openSUSE's nginx package. Some
+# versions/spins use /srv/www/htdocs -- verify with
+# `rpm -ql nginx | grep html` on your image and adjust if needed.
+webserver_docroot: /srv/www/htdocs
+
+webserver_firewall_backend: firewalld

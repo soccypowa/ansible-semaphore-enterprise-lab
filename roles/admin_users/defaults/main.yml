@@ -1,0 +1,10 @@
+---
+admin_users_accounts: []
+admin_users_sudo_requires_password: true
+admin_users_sudo_group: wheel
+
+# Safety default: offboarded admins (state: absent) get their SSH key
+# pulled and their account locked/de-privileged, but the account and home
+# directory are kept for forensic/audit purposes. Set this to true if your
+# offboarding policy requires full deletion instead.
+admin_users_purge_absent: false

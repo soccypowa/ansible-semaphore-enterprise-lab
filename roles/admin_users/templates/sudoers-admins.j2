@@ -1,0 +1,6 @@
+{# Managed by Ansible (roles/admin_users) - do not edit by hand. #}
+{% if admin_users_sudo_requires_password %}
+%{{ admin_users_sudo_group }} ALL=(ALL:ALL) ALL
+{% else %}
+%{{ admin_users_sudo_group }} ALL=(ALL:ALL) NOPASSWD: ALL
+{% endif %}

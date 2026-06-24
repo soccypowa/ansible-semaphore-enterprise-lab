@@ -1,0 +1,10 @@
+.env
+*.retry
+*.vault_pass
+*.vault-password
+__pycache__/
+*.pyc
+.ansible/
+venv/
+semaphore_automation_key
+semaphore_automation_key.pub

@@ -1,0 +1,62 @@
+services:
+  semaphore-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${SEMAPHORE_DB_USER}
+      POSTGRES_PASSWORD: ${SEMAPHORE_DB_PASS}
+      POSTGRES_DB: ${SEMAPHORE_DB_NAME}
+    volumes:
+      - semaphore-db-data:/var/lib/postgresql/data
+    networks:
+      - semaphore-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${SEMAPHORE_DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  semaphore:
+    image: semaphoreui/semaphore:latest
+    restart: unless-stopped
+    depends_on:
+      semaphore-db:
+        condition: service_healthy
+    environment:
+      SEMAPHORE_DB_DIALECT: postgres
+      SEMAPHORE_DB_HOST: semaphore-db
+      SEMAPHORE_DB_PORT: "5432"
+      SEMAPHORE_DB_USER: ${SEMAPHORE_DB_USER}
+      SEMAPHORE_DB_PASS: ${SEMAPHORE_DB_PASS}
+      SEMAPHORE_DB_NAME: ${SEMAPHORE_DB_NAME}
+      SEMAPHORE_ADMIN: ${SEMAPHORE_ADMIN_USER}
+      SEMAPHORE_ADMIN_PASSWORD: ${SEMAPHORE_ADMIN_PASS}
+      SEMAPHORE_ADMIN_NAME: ${SEMAPHORE_ADMIN_NAME}
+      SEMAPHORE_ADMIN_EMAIL: ${SEMAPHORE_ADMIN_EMAIL}
+      # These three encrypt everything Semaphore stores at rest (saved SSH
+      # keys, vault passwords, login/password credentials, session cookies).
+      # Generate each with `openssl rand -base64 32` and back them up the
+      # same way you would a root CA key -- losing them means losing access
+      # to every secret Semaphore is holding.
+      SEMAPHORE_COOKIE_HASH: ${SEMAPHORE_COOKIE_HASH}
+      SEMAPHORE_COOKIE_ENCRYPTION: ${SEMAPHORE_COOKIE_ENCRYPTION}
+      SEMAPHORE_ACCESS_KEY_ENCRYPTION: ${SEMAPHORE_ACCESS_KEY_ENCRYPTION}
+    ports:
+      # Bound to loopback only: put a TLS-terminating reverse proxy
+      # (Caddy/Traefik/nginx) in front for anything beyond a lab. See
+      # README.md "Putting Semaphore behind TLS".
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - semaphore-data:/var/lib/semaphore
+      - semaphore-config:/etc/semaphore
+    networks:
+      - semaphore-internal
+
+networks:
+  semaphore-internal:
+    driver: bridge
+
+volumes:
+  semaphore-db-data:
+  semaphore-data:
+  semaphore-config:

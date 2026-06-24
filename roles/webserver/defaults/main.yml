@@ -1,0 +1,7 @@
+---
+webserver_package: nginx
+webserver_service: nginx
+webserver_docroot: /var/www/html
+webserver_http_port: 80
+webserver_manage_firewall: true
+webserver_firewall_backend: none # none | ufw | firewalld -- set per-group in inventory/production/group_vars/

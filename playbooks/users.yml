@@ -1,0 +1,12 @@
+---
+# Day-2 playbook, run as ansible_svc (the service account created by
+# bootstrap_service_account.yml). Safe to run repeatedly and to schedule in
+# Semaphore -- it's fully idempotent, and editing admin_users_accounts in
+# group_vars/all/vars.yml is the only thing you should ever need to touch to
+# add, change, or revoke a human admin's access.
+
+- name: Provision human admin accounts
+  hosts: managed_nodes
+  become: true
+  roles:
+    - role: admin_users

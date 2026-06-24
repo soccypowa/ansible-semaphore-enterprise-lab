@@ -1,0 +1,4 @@
+---
+admin_users_sudo_group: sudo
+webserver_docroot: /var/www/html
+webserver_firewall_backend: ufw

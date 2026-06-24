@@ -1,0 +1,80 @@
+---
+# Every entry in admin_users_accounts carries an explicit `state`
+# (present, the default, or absent). Offboarding someone means flipping
+# their entry to `state: absent` and keeping it in the list -- NOT deleting
+# the entry outright. Deleting the entry just stops Ansible from looking at
+# that user at all, which leaves their account, sudo membership and SSH key
+# exactly as they were. `state: absent` is what actually revokes access.
+
+- name: Ensure the privilege-escalation group exists
+  ansible.builtin.group:
+    name: "{{ admin_users_sudo_group }}"
+    state: present
+
+- name: Create or update active admin user accounts
+  ansible.builtin.user:
+    name: "{{ item.username }}"
+    comment: "{{ item.comment | default(item.username) }}"
+    groups: "{{ [admin_users_sudo_group] if (item.sudo | default(true)) else [] }}"
+    append: true
+    shell: /bin/bash
+    create_home: true
+    password: "!" # locked: SSH key is the only way in, there is no password to guess
+    update_password: on_create
+  loop: "{{ admin_users_accounts }}"
+  loop_control:
+    label: "{{ item.username }}"
+  when: (item.state | default('present')) == 'present'
+
+- name: Deploy authorized SSH keys for active admins
+  ansible.posix.authorized_key:
+    user: "{{ item.username }}"
+    state: present
+    exclusive: true # rotating ssh_pubkey here revokes the old key automatically
+    key: "{{ item.ssh_pubkey }}"
+  loop: "{{ admin_users_accounts }}"
+  loop_control:
+    label: "{{ item.username }}"
+  when: (item.state | default('present')) == 'present'
+
+- name: Render sudo policy for the admin group
+  ansible.builtin.template:
+    src: sudoers-admins.j2
+    dest: "/etc/sudoers.d/10-admins-{{ admin_users_sudo_group }}"
+    owner: root
+    group: root
+    mode: "0440"
+    validate: "visudo -cf %s"
+
+- name: Revoke SSH access for offboarded admins
+  ansible.builtin.file:
+    path: "/home/{{ item.username }}/.ssh/authorized_keys"
+    state: absent
+  loop: "{{ admin_users_accounts }}"
+  loop_control:
+    label: "{{ item.username }}"
+  when: (item.state | default('present')) == 'absent'
+
+- name: Strip group membership and disable shell login for offboarded admins
+  ansible.builtin.user:
+    name: "{{ item.username }}"
+    groups: []
+    append: false
+    shell: /usr/sbin/nologin
+    password: "!"
+  loop: "{{ admin_users_accounts }}"
+  loop_control:
+    label: "{{ item.username }}"
+  when: (item.state | default('present')) == 'absent'
+
+- name: Fully delete offboarded admin accounts (opt-in)
+  ansible.builtin.user:
+    name: "{{ item.username }}"
+    state: absent
+    remove: true
+  loop: "{{ admin_users_accounts }}"
+  loop_control:
+    label: "{{ item.username }}"
+  when:
+    - (item.state | default('present')) == 'absent'
+    - admin_users_purge_absent | bool

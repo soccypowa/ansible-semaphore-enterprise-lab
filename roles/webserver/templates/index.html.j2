@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ inventory_hostname }} - managed by Ansible</title>
+</head>
+<body style="font-family: sans-serif; max-width: 40em; margin: 4em auto; line-height: 1.5;">
+  <h1>It works! &#127881;</h1>
+  <p>This page was deployed by Ansible, triggered from Semaphore.</p>
+  <ul>
+    <li><strong>Inventory hostname:</strong> {{ inventory_hostname }}</li>
+    <li><strong>Distribution:</strong> {{ ansible_facts.distribution }} {{ ansible_facts.distribution_version }}</li>
+    <li><strong>OS family:</strong> {{ ansible_facts.os_family }}</li>
+    <li><strong>Kernel:</strong> {{ ansible_facts.kernel }}</li>
+    <li><strong>Deployed:</strong> {{ ansible_date_time.iso8601 }}</li>
+  </ul>
+</body>
+</html>

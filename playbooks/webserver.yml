@@ -1,0 +1,21 @@
+---
+# Targets the "webservers" group, which (see inventory/production/hosts.yml)
+# currently includes all three managed hosts. Run against everyone with:
+#
+#   ansible-playbook playbooks/webserver.yml
+#
+# ...or against a subset using --limit, e.g. just the Ubuntu box, or just
+# the RHEL and openSUSE boxes:
+#
+#   ansible-playbook playbooks/webserver.yml --limit ubuntu
+#   ansible-playbook playbooks/webserver.yml --limit 'redhat,opensuse'
+#
+# In Semaphore, expose this as a Survey Variable on the Task Template (see
+# README.md "Wiring it up in Semaphore") so operators can pick the target
+# from a form field instead of editing YAML.
+
+- name: Deploy the demo webserver
+  hosts: webservers
+  become: true
+  roles:
+    - role: webserver

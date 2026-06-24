@@ -1,0 +1,51 @@
+---
+# Variables that apply to every managed host regardless of distro.
+# Keep this file secret-free -- it is plaintext and meant to be readable
+# in code review / git history. Real secrets go in vault.yml (encrypted).
+
+ansible_python_interpreter: auto_silent
+
+# Human admin accounts provisioned by playbooks/users.yml.
+# Public keys are not sensitive and are safe to commit. Never put
+# private keys or passwords here.
+#
+# Schema per entry:
+#   username:   required
+#   comment:    optional, GECOS field (defaults to username)
+#   ssh_pubkey: required when state is "present"
+#   sudo:       optional, default true -- false creates the account with no
+#               admin group membership at all
+#   state:      optional, "present" (default) or "absent"
+#
+# IMPORTANT: to offboard someone, set their state to "absent" and KEEP the
+# entry in this list. Deleting the entry outright does nothing -- Ansible
+# only acts on what's listed, so a removed entry is simply never looked at
+# again, and the account/key/sudo access on the box stays exactly as it
+# was. "absent" actively revokes the SSH key, strips sudo group
+# membership, and disables the shell; it does not delete the account or
+# home directory unless you also set admin_users_purge_absent: true.
+admin_users_accounts:
+  - username: alice
+    comment: "Alice Admin"
+    ssh_pubkey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGqr8h5J5wlcU3z9p9o7s8s9o2p9x1q2w3e4r5t6y7u8 alice@example.com"
+    sudo: true
+  - username: bob
+    comment: "Bob Operator"
+    ssh_pubkey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN0y1u2i3o4p5a6s7d8f9g0h1j2k3l4z5x6c7v8b9n0 bob@example.com"
+    sudo: true
+  # Example of an offboarded admin -- kept in the list on purpose:
+  # - username: carol
+  #   state: absent
+
+# Replace the keys above with real public keys before running anything.
+
+# When true, sudo for human admins requires their own password (recommended
+# for anything beyond a throwaway lab). When false, sudo is passwordless
+# for the whole admin group -- convenient, but think hard before doing this
+# outside a sandbox.
+admin_users_sudo_requires_password: true
+
+# Shared webserver defaults (the per-OS specifics live in
+# group_vars/ubuntu.yml, group_vars/opensuse.yml, group_vars/redhat.yml)
+webserver_http_port: 80
+webserver_manage_firewall: true

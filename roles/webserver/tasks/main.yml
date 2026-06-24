@@ -1,0 +1,55 @@
+---
+# Using the generic `package`/`service` modules (rather than apt/dnf/zypper
+# specific ones) is what lets one task list work across Ubuntu, openSUSE and
+# RHEL: Ansible picks the right backend per host automatically. The package
+# and service names happen to both be "nginx" on all three families, so no
+# per-OS branching is needed here -- only the doc root path and the
+# firewall backend differ, and those come from group_vars (see
+# inventory/production/group_vars/{ubuntu,opensuse,redhat}.yml).
+
+- name: Install the webserver package
+  ansible.builtin.package:
+    name: "{{ webserver_package }}"
+    state: present
+
+- name: Ensure the webserver service is enabled and running
+  ansible.builtin.service:
+    name: "{{ webserver_service }}"
+    enabled: true
+    state: started
+
+- name: Deploy the demo index page
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: "{{ webserver_docroot }}/index.html"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload webserver
+
+- name: Allow SSH through ufw before touching any other rule (avoid lockout)
+  community.general.ufw:
+    rule: allow
+    name: OpenSSH
+  when:
+    - webserver_manage_firewall | bool
+    - webserver_firewall_backend == "ufw"
+
+- name: Open the webserver port (ufw backend)
+  community.general.ufw:
+    rule: allow
+    port: "{{ webserver_http_port | string }}"
+    proto: tcp
+  when:
+    - webserver_manage_firewall | bool
+    - webserver_firewall_backend == "ufw"
+
+- name: Open the webserver service (firewalld backend)
+  ansible.posix.firewalld:
+    service: http
+    permanent: true
+    immediate: true
+    state: enabled
+  when:
+    - webserver_manage_firewall | bool
+    - webserver_firewall_backend == "firewalld"
