@@ -10,18 +10,12 @@ services:
       - semaphore-db-data:/var/lib/postgresql/data
     networks:
       - semaphore-internal
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${SEMAPHORE_DB_USER}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   semaphore:
     image: semaphoreui/semaphore:latest
     restart: unless-stopped
     depends_on:
-      semaphore-db:
-        condition: service_healthy
+      - semaphore-db
     environment:
       SEMAPHORE_DB_DIALECT: postgres
       SEMAPHORE_DB_HOST: semaphore-db
