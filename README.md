@@ -547,17 +547,8 @@ openSUSE images where you can SSH in as a sudo-capable default user:
 
 ```bash
 ansible-playbook -i inventory/production/hosts.yml \
-  -u <initial-user> --ask-become-pass \
-  -e "semaphore_pubkey=$(cat semaphore_automation_key.pub)" \
-  playbooks/bootstrap_service_account.yml
-```
-
-Or as root directly:
-
-```bash
-ansible-playbook -i inventory/production/hosts.yml \
-  -u root -k \
-  -e "semaphore_pubkey=$(cat semaphore_automation_key.pub)" \
+   --ask-become-pass --ask-vault-password \
+  -e "{\"semaphore_pubkey\": \"$(cat semaphore_automation_key.pub)\"}" \
   playbooks/bootstrap_service_account.yml
 ```
 
