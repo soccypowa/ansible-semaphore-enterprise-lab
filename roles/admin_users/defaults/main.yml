@@ -1,6 +1,6 @@
 ---
 admin_users_accounts: []
-admin_users_sudo_requires_password: true
+admin_users_sudo_requires_password: false
 admin_users_sudo_group: wheel
 
 # Safety default: offboarded admins (state: absent) get their SSH key
