@@ -1,0 +1,27 @@
+# Managed by Ansible (roles/sshd) - do not edit by hand
+# Changes will be overwritten by next Ansible run.
+
+Port {{ sshd_port }}
+Protocol 2
+
+# Authentication
+PermitRootLogin {{ sshd_permit_root_login }}
+PubkeyAuthentication {{ sshd_pubkey_authentication }}
+PasswordAuthentication {{ sshd_password_authentication }}
+AuthorizedKeysFile .ssh/authorized_keys
+MaxAuthTries {{ sshd_max_auth_tries }}
+
+# Forwarding
+X11Forwarding {{ sshd_x11_tcp_forwarding }}
+AllowTcpForwarding {{ sshd_allow_tcp_forwarding }}
+
+# Session keepalive
+ClientAliveInterval {{ sshd_client_alive_interval }}
+ClientAliveCountMax {{ sshd_client_alive_count_max }}
+
+# Subsystems
+Subsystem sftp {{ sshd_sftp_subsystem }}
+
+{% if sshd_allow_groups | length >0 %}
+AllowGroups {{ sshd_allow_groups | join(' ') }}
+{% endif %}

@@ -1,0 +1,18 @@
+---
+# All variables are prefixed sshd_ to avoid collisions (ansible-lint
+# production profile enforces this).
+
+sshd_port: 22
+sshd_permit_root_login: "no"
+sshd_password_authentication: "no"
+sshd_pubkey_authentication: "yes"
+sshd_max_auth_tries: 3
+sshd_x11_forwarding: "no"
+sshd_allow_tcp_forwarding: "no"
+sshd_client_alive_interval: 300
+sshd_client_alive_count_max: 2
+
+# Which groups are allowed to SSH in at all.
+# Populated from group_vars or playbook vars -- empty means no AllowGroups
+# line is written (i.e. everyone can attempt to connect).
+sshd_allow_groups: []

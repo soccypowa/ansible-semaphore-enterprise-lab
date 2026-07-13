@@ -1,0 +1,11 @@
+---
+# IMPORTANT: run playbooks/users.yml first and confirm at least one admin
+# account can SSH in with a key before running this. Once
+# sshd_password_authentication is set to "no", password-based SSH is gone.
+# If no key-based account works yet, you will lock yourself out.
+
+- name: Hardeninge SSH daemon configuration
+  hosts: managed_nodes
+  become: true
+  roles:
+    - role: sshd
