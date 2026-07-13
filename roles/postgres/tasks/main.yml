@@ -7,7 +7,7 @@
 - name: Initialise the database cluster (RHEL only)
   ansible.builtin.command:
     cmd: "postgresql-setup --initdb"
-    creates: "{{ postgres_config_dir }}/PG_VERSION"
+    creates: "{{ postgres_config_dir }}"
   when: postgres_needs_initdb | bool
 
 - name: Ensure PostgreSQL service is enabled and running
@@ -37,8 +37,8 @@
   community.general.postgresql_db:
     name: "{{ item.name }}"
     encoding: "{{ item.encoding | default('UTF8') }}"
-    lc_collate: "{{ item.lc_collate | default('en_US.UTF8') }}"
-    lc_ctype: "{{ item.lc_ctype | default('en_US.UTF8') }}"
+    lc_collate: "{{ item.lc_collate | default('en_US.UTF-8') }}"
+    lc_ctype: "{{ item.lc_ctype | default('en_US.UTF-8') }}"
     state: present
   loop: "{{ postgres_databases }}"
   loop_control:
