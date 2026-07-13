@@ -1,3 +1,5 @@
 # Install into an isolated environment (pipx or venv), not system pip.
 # See README.md "Installing Ansible" for why.
+# 2.18.18 requires Python 13.13.X
 ansible-core>=2.18,<2.19
+ansible-lint==25.11.1
