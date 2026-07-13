@@ -49,3 +49,8 @@ admin_users_sudo_requires_password: true
 # group_vars/ubuntu.yml, group_vars/opensuse.yml, group_vars/redhat.yml)
 webserver_http_port: 80
 webserver_manage_firewall: true
+
+sshd_password_authentication: "no"
+sshd_permit_root_login: "no"
+sshd_allow_groups:
+  - "{{ admin_users_sudo_group }}" # reuse the sudo group variable -- only admins can SSH in
