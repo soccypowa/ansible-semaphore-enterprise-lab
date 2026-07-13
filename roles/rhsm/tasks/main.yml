@@ -15,7 +15,7 @@
   when:
     - rhsm_auth_method == "activation_key"
     - "'Current' not in rhsm_status.stdout"
-  no_log: true
+  no_log: false
 
 - name: Register with Red Hat (Username and Password)
   community.general.redhat_subscription:
