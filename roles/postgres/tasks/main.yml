@@ -4,7 +4,7 @@
     name:
       - "postgresql"
       - "postgresql-contrib"
-      - python3-psycopg # Required by the community module
+      - python3-psycopg2 # Required by the community module
     state: present
 
 - name: Ensure PostgreSQL service is enabled and running
