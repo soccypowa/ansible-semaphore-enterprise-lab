@@ -22,9 +22,9 @@
     state: present
     username: "{{ rhsm_username }}"
     password: "{{ rhsm_password }}"
-    when:
-      - rhsm_auth_method == "username_Password"
-      - "'Current' not in rhsm_status.stdout"
+  when:
+    - rhsm_auth_method == "username_Password"
+    - "'Current' not in rhsm_status.stdout"
   no_log: true
 
 - name: Pin release version
