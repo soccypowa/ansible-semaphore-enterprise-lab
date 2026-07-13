@@ -11,3 +11,5 @@ admin_users_sudo_group: wheel
 webserver_docroot: /srv/www/htdocs
 
 webserver_firewall_backend: firewalld
+
+sshd_sftp_subsystem: /usr/lib/ssh/sftp-server

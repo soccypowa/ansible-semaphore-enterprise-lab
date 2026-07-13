@@ -2,3 +2,4 @@
 admin_users_sudo_group: wheel
 webserver_docroot: /usr/share/nginx/html
 webserver_firewall_backend: firewalld
+sshd_sftp_subsystem: /usr/lib/openssh/sftp-server
