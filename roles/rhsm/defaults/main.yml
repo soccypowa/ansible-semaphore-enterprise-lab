@@ -1,0 +1,18 @@
+---
+# Authentication method: "activation_key" or "username_password"
+rhsm_auth_method: username_password
+
+# Activation key method (recommended)
+rhsm_org_id: "{{ vault_rhsm_org_id | default('') }}"
+rhsm_activation_key: "{{ vault_rhsm_activation_key | default('') }}"
+
+# Username/password method (fallback)
+rhsm_username: "{{ vault_rhsm_username | default('') }}"
+rhsm_password: "{{ vault_rhsm_password | default('') }}"
+
+# Optionally pin to a specific release -- leave empty to track latest
+rhsm_release: ""
+
+# Repos to enable after registration. Empty list means use whatever
+# the subscription enables by default.
+rhsm_repositories: []

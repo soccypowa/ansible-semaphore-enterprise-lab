@@ -1,0 +1,14 @@
+---
+# Red Hat subscription registration.
+# Targets only the redhat group -- this role should never run on
+# Ubuntu or openSUSE nodes. The community.general.redhat_subscription
+# module will fail on non-RHEL systems.
+#
+# Run this before any playbook that installs packages on RHEL hosts,
+# otherwise dnf will have no repos to pull from.
+
+- name: Register Red Hat nodes with RHSM
+  hosts: redhat
+  become: true
+  roles:
+    - role: rhsm

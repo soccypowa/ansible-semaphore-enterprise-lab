@@ -1,0 +1,43 @@
+---
+- name: Check current registration status
+  ansible.builtin.command:
+    cmd: subscription-manager status
+  register: rhsm_status
+  changed_when: false
+  failed_when: false
+  no_log: false
+
+- name: Register with Red Hat (Activation key)
+  community.general.redhat_subscription:
+    state: present
+    org_id: "{{ rhsm_org_id }}"
+    activationkey: "{{ rhsm_activation_key }}"
+  when:
+    - rhsm_auth_method == "activation_key"
+    - "'Current' not in rhsm_status.stdout"
+  no_log: true
+
+- name: Register with Red Hat (Username and Password)
+  community.general.redhat_subscription:
+    state: present
+    username: "{{ rhsm_username }}"
+    password: "{{ rhsm_password }}"
+    when:
+      - rhsm_auth_method == "username_Password"
+      - "'Current' not in rhsm_status.stdout"
+    no_log: true
+
+- name: Pin release version
+  ansible.builtin.command:
+    cmd: "subscription-manager release --set={{ rhsm_release }}"
+  when:
+    - rhsm_release | length > 0
+    - "'Current' not in rhsm_status.stdout"
+  changed_when: true
+
+- name: Enable required repositories
+  community.general.rhsm_repository:
+    name: "{{ item }}"
+    state: enabled
+  loop: "{{ rhsm_repositories }}"
+  when: rhsm_repositories | length > 0
