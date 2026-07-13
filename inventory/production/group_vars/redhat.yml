@@ -3,6 +3,10 @@ admin_users_sudo_group: wheel
 webserver_docroot: /usr/share/nginx/html
 webserver_firewall_backend: firewalld
 sshd_sftp_subsystem: /usr/lib/openssh/sftp-server
+postgres_packages:
+  - postgresql-server
+  - postgresql-contrib
+  - python3-psycopg2
 
 rhsm_auth_method: activation_key
 rhsm_org_id: "{{ vault_rhsm_org_id }}"
