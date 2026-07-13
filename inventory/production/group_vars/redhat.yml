@@ -4,7 +4,7 @@ webserver_docroot: /usr/share/nginx/html
 webserver_firewall_backend: firewalld
 sshd_sftp_subsystem: /usr/lib/openssh/sftp-server
 
-rhsm_auth_method: username_password
+rhsm_auth_method: activation_key
 rhsm_org_id: "{{ vault_rhsm_org_id }}"
 rhsm_activation_key: "{{ vault_rhsm_activation_key }}"
 

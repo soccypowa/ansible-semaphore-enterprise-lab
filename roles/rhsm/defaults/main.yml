@@ -1,6 +1,6 @@
 ---
 # Authentication method: "activation_key" or "username_password"
-rhsm_auth_method: username_password
+rhsm_auth_method: activation_key
 
 # Activation key method (recommended)
 rhsm_org_id: "{{ vault_rhsm_org_id | default('') }}"
