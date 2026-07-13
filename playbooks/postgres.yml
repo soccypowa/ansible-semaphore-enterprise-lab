@@ -5,11 +5,11 @@
 # it's serving.
 #
 # To target just one system:
-#   ansible-playbook playbooks/postgres.yml --limit db_hr
-#   ansible-playbook playbooks/postgres.yml --limit db_finance
+#   ansible-playbook playbooks/postgres.yml -e "target_hosts=db_hr"
+#   ansible-playbook playbooks/postgres.yml -e "target_hosts=db_finance"
 
 - name: Configure PostgreSQL database servers
-  hosts: db_servers
+  hosts: "{{ target_hosts | default('db_servers') }}"
   become: true
   roles:
     - role: postgres
