@@ -4,6 +4,12 @@
     name: "{{ postgres_packages }}"
     state: present
 
+- name: Initialise the database cluster (RHEL only)
+  ansible.builtin.command:
+    cmd: "/usr/pgsql-{{ postgres_version }}/bin/postgresql-{{ postgres_version }}-setup initdb"
+    creates: "{{ postgres_config_dir }}/PG_VERSION"
+  when: postgres_needs_initdb | bool
+
 - name: Ensure PostgreSQL service is enabled and running
   ansible.builtin.service:
     name: postgresql
@@ -12,7 +18,7 @@
 
 - name: Set listen_addresses in postgreslq.conf
   ansible.builtin.lineinfile:
-    path: "/etc/postgresql/{{ postgres_version }}/main/postgresql.conf"
+    path: "{{ postgres_conf_file }}"
     regexp: "^#?listen_addresses"
     line: "listen_addresses = {{ postgres_listen_addresses }}"
     state: present
@@ -21,7 +27,7 @@
 - name: Configure pg_hba.conf (client auth)
   ansible.builtin.template:
     src: pg_hba.conf.j2
-    dest: "/etc/postgresql/{{ postgres_version }}/main/pg_hba.conf"
+    dest: "{{ postgres_hba_file }}"
     owner: postgres
     group: postgres
     mode: "0640"
