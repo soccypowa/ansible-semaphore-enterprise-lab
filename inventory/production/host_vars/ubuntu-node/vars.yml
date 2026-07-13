@@ -1,0 +1,30 @@
+---
+# PostgreSQL configuration for the HR system database server.
+# Passwords are never stored here -- they reference vault variables
+# defined in host_vars/ubuntu-node/vault.yml.
+
+postgres_databases:
+  - name: hr_production
+    encoding: UTF8
+    lc_collate: en_US.UTF8
+    lc_ctype: en_US.UTF8
+
+postgres_users:
+  - name: hr_app
+    password: "{{ vault_hr_app_db_password }}"
+    databases:
+      - hr_production
+    privs: ALL
+  - name: hr_readonly
+    password: "{{ vault_hr_readonly_db_password }}"
+    databases:
+      - hr_production
+    privs: SELECT
+
+# Hosts allowed to connect. The app server's IP -- not 0.0.0.0.
+# Add one entry per application server that needs to reach this DB.
+postgres_allowed_hosts:
+  - ip: 192.168.0.46/32 # Localhost
+    auth_method: scram-sha-256
+  - ip: 192.168.0.37/32 # Lilou
+    auth_method: scram-sha-256

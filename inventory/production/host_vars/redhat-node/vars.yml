@@ -1,0 +1,32 @@
+---
+# PostgreSQL configuration for the Finance system database server.
+
+postgres_databases:
+  - name: finance_production
+    encoding: UTF8
+    lc_collate: en_US.UTF8
+    lc_ctype: en_US.UTF8
+  - name: finance_reporting
+    encoding: UTF8
+    lc_collate: en_US.UTF8
+    lc_ctype: en_US.UTF8
+
+postgres_users:
+  - name: finance_app
+    password: "{{ vault_finance_app_db_password }}"
+    databases:
+      - finance_production
+    privs: ALL
+  - name: finance_reporting
+    password: "{{ vault_finance_reporting_db_password }}"
+    databases:
+      - finance_reporting
+    privs: SELECT
+
+# Hosts allowed to connect. The app server's IP -- not 0.0.0.0.
+# Add one entry per application server that needs to reach this DB.
+postgres_allowed_hosts:
+  - ip: 192.168.0.11/32 # Localhost
+    auth_method: scram-sha-256
+  - ip: 192.168.0.37/32 # Lilou
+    auth_method: scram-sha-256
