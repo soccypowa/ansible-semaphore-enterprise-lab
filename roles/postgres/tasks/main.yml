@@ -1,10 +1,7 @@
 ---
 - name: Instal PostgreSQL packages
   ansible.builtin.package:
-    name:
-      - "postgresql"
-      - "postgresql-contrib"
-      - python3-psycopg2 # Required by the community module
+    name: "{{ postgres_packages }}"
     state: present
 
 - name: Ensure PostgreSQL service is enabled and running
