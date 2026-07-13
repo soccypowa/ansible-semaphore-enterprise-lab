@@ -33,6 +33,12 @@
     mode: "0640"
   notify: Reload PostgreSQL
 
+- name: Ensure English locale is installed
+  ansible.builtin.package:
+    name: glibc-langpack-en
+    state: present
+  when: ansible_os_family == "RedHat"
+
 - name: Create application databases
   community.general.postgresql_db:
     name: "{{ item.name }}"
