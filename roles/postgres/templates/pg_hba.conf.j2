@@ -1,0 +1,16 @@
+# Managed by Ansible (roles/postgres) - do not edit by hand.
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# Local Unix socket connections for the postgres admin account
+local   all             postgres                                peer
+
+# Local Unix socket connections for all other users
+local   all             all                                     scram-sha-256
+
+# IPv4 loopback
+host    all             all             127.0.0.1/32            scram-sha-256
+
+{% for entry in postgres_allowed_hosts %}
+# {{ entry.ip }}
+host    all             all             {{ entry.ip }}          {{ entry.auth_method }}
+{% endfor %}

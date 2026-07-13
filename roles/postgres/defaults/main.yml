@@ -1,0 +1,8 @@
+---
+postgres_version: 16
+postgres_databases: []
+postgres_users: []
+postgres_allowed_hosts: []
+
+postgres_admin_user: postgres
+postgres_listen_addresses: "'*'"
