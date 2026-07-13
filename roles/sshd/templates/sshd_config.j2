@@ -12,7 +12,7 @@ AuthorizedKeysFile .ssh/authorized_keys
 MaxAuthTries {{ sshd_max_auth_tries }}
 
 # Forwarding
-X11Forwarding {{ sshd_x11_tcp_forwarding }}
+X11Forwarding {{ sshd_x11_forwarding }}
 AllowTcpForwarding {{ sshd_allow_tcp_forwarding }}
 
 # Session keepalive
