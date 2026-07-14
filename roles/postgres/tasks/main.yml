@@ -26,7 +26,9 @@
     removes: "{{ postgres_config_dir }}/PG_VERSION"
   become: true
   become_user: "{{ postgres_admin_user }}"
-  when: ansible_os_family == "Debian"
+  when:
+    - ansible_os_family == "Debian"
+    - not postgres_cluster_exists | default(false)
   notify: Reload PostgreSQL
 
 - name: Initialise the database cluster with correct locale (Ubuntu)
@@ -39,7 +41,8 @@
     creates: "{{ postgres_config_dir }}/PG_VERSION"
   become: true
   become_user: "{{ postgres_admin_user }}"
-  when: ansible_os_family == "Debian"
+  when:
+    - ansible_os_family == "Debian"
 
 - name: Ensure PostgreSQL service is enabled and running
   ansible.builtin.service:
