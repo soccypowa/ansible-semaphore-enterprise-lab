@@ -24,6 +24,8 @@
     cmd: "pg_dropcluster {{ postgres_version }} main --stop"
   args:
     removes: "{{ postgres_config_dir }}/PG_VERSION"
+  become: true
+  become_user: "{{ postgres_admin_user }}"
   when: ansible_os_family == "Debian"
 
 - name: Initialise the database cluster with correct locale (Ubuntu)
@@ -34,6 +36,8 @@
       {{ postgres_version }} main
   args:
     creates: "{{ postgres_config_dir }}/PG_VERSION"
+  become: true
+  become_user: "{{ postgres_admin_user }}"
   when: ansible_os_family == "Debian"
 
 - name: Ensure PostgreSQL service is enabled and running
