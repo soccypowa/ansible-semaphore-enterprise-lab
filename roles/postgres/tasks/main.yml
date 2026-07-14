@@ -14,6 +14,8 @@
   ansible.builtin.command:
     cmd: "/usr/bin/postgresql-setup --initdb"
     creates: "{{ postgres_config_dir }}"
+  become: true
+  become_user: "{{ postgres_admin_user }}"
   when: ansible_os_family == "RedHat"
 
 - name: Ensure PostgreSQL service is enabled and running
