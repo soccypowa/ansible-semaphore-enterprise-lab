@@ -19,7 +19,7 @@ postgres_users:
     password: "{{ vault_hr_readonly_db_password }}"
     databases:
       - hr_production
-    privs: CONNECT
+    privs: CONNECT # SELECT är en tabell behörighet, i main.yml sätter vi tpe: database och då kan vi inte välja SELECT
 
 # Hosts allowed to connect. The app server's IP -- not 0.0.0.0.
 # Add one entry per application server that needs to reach this DB.
