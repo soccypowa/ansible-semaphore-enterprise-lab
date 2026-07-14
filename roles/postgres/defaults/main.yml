@@ -7,6 +7,7 @@ postgres_packages:
   - postgresql
   - postgresql-contrib
   - python3-psycopg2
+postgres_language_pack: language-pack-en
 postgres_config_dir: "/etc/postgresql/{{ postgres_version }}/main"
 postgres_conf_file: "/etc/postgresql/{{ postgres_version }}/main/postgresql.conf"
 postgres_hba_file: "/etc/postgresql/{{ postgres_version }}/main/pg_hba.conf"

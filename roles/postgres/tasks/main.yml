@@ -1,7 +1,7 @@
 ---
 - name: Ensure English locale is installed
   ansible.builtin.package:
-    name: glibc-langpack-en
+    name: "{{ postgres_language_pack }}"
     state: present
 
 - name: Install PostgreSQL packages
