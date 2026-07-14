@@ -12,12 +12,29 @@
 - name: Initialise the database cluster (RHEL only)
   ansible.builtin.command:
     cmd: /usr/bin/postgresql-setup --initdb
-    creates: "{{ postgres_config_dir }}/base"
+    creates: "{{ postgres_config_dir }}/PG_VERSION"
   environment:
     PGSETUP_INITDB_OPTIONS: "--locale={{ postgres_initdb_locale }}"
   become: true
   become_user: "{{ postgres_admin_user }}"
   when: ansible_os_family == "RedHat"
+
+- name: Drop the default cluster (Ubuntu)
+  ansible.builtin.command:
+    cmd: "pg_dropcluster {{ postgres_version }} main --stop"
+  args:
+    removes: "{{ postgres_config_dir }}/PG_VERSION"
+  when: ansible_os_family == "Debian"
+
+- name: Initialise the database cluster with correct locale (Ubuntu)
+  ansible.builtin.command:
+    cmd: >
+      pg_createcluster
+      --locale {{ postgres_initdb_locale }}
+      {{ postgres_version }} main
+  args:
+    creates: "{{ postgres_config_dir }}/PG_VERSION"
+  when: ansible_os_family == "Debian"
 
 - name: Ensure PostgreSQL service is enabled and running
   ansible.builtin.service:
