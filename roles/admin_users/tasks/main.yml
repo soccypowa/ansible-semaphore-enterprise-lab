@@ -19,7 +19,7 @@
     append: true
     shell: /bin/bash
     create_home: true
-    password: "!" # locked: SSH key is the only way in, there is no password to guess
+    password: "*" # locked: SSH key is the only way in, there is no password to guess
     update_password: on_create
   loop: "{{ admin_users_accounts }}"
   loop_control:
