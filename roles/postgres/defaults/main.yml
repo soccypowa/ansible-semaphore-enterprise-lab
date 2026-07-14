@@ -7,6 +7,7 @@ postgres_packages:
   - postgresql
   - postgresql-contrib
   - python3-psycopg2
+postgres_service: "postgresql@{{ postgres_version }}-main"
 postgres_language_pack: language-pack-en
 postgres_initdb_locale: en_US.utf8
 postgres_config_dir: "/etc/postgresql/{{ postgres_version }}/main"

@@ -43,7 +43,7 @@
 
 - name: Ensure PostgreSQL service is enabled and running
   ansible.builtin.service:
-    name: postgresql
+    name: "{{ postgres_service }}"
     enabled: true
     state: started
 

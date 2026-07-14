@@ -7,6 +7,7 @@ postgres_packages:
   - postgresql-server
   - postgresql-contrib
   - python3-psycopg2
+postgres_service: postgres
 postgres_language_pack: glibc-langpack-en
 postgres_config_dir: /var/lib/pgsql/data
 postgres_conf_file: /var/lib/pgsql/data/postgresql.conf
