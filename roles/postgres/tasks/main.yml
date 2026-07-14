@@ -11,7 +11,7 @@
 
 - name: Initialise the database cluster (RHEL only)
   ansible.builtin.command:
-    cmd: "usr/bin/postgresql-setup --initdb --locale {{ postgres_initdb_locale | default('en_US.utf8') }}"
+    cmd: "initdb {{ postgres_config_dir }} --locale {{ postgres_initdb_locale | default('en_US.utf8') }}"
     creates: "{{ postgres_config_dir }}"
   become: true
   become_user: "{{ postgres_admin_user }}"
