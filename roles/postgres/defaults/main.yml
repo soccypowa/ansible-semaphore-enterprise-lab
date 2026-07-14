@@ -9,6 +9,6 @@ postgres_packages:
   - python3-psycopg2
 postgres_config_dir: "/etc/postgresql/{{ postgres_version }}/main"
 postgres_conf_file: "/etc/postgresql/{{ postgres_version }}/main/postgresql.conf"
-postgres_hba_file: "/var/lib/pgsql/{{ postgres_version }}/data/pg_hba.conf"
+postgres_hba_file: "/etc/postgresql/{{ postgres_version }}/main/pg_hba.conf"
 postgres_admin_user: postgres
 postgres_listen_addresses: "'*'"
