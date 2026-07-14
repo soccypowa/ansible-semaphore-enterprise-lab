@@ -19,7 +19,7 @@ postgres_users:
     password: "{{ vault_hr_readonly_db_password }}"
     databases:
       - hr_production
-    privs: SELECT
+    privs: CONNECT
 
 # Hosts allowed to connect. The app server's IP -- not 0.0.0.0.
 # Add one entry per application server that needs to reach this DB.
