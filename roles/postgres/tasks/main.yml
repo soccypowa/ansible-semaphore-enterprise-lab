@@ -81,4 +81,4 @@
     label: "{{ ptiv_item.0.name }} -> {{ priv_item.1 }}"
   become: true
   become_user: "{{ postgres_admin_user }}"
-  no_log: true
+  no_log: false
