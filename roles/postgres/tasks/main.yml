@@ -1,18 +1,17 @@
 ---
-- name: Instal PostgreSQL packages
-  ansible.builtin.package:
-    name: "{{ postgres_packages }}"
-    state: present
-
 - name: Ensure English locale is installed
   ansible.builtin.package:
     name: glibc-langpack-en
     state: present
-  when: ansible_os_family == "RedHat"
+
+- name: Install PostgreSQL packages
+  ansible.builtin.package:
+    name: "{{ postgres_packages }}"
+    state: present
 
 - name: Initialise the database cluster (RHEL only)
   ansible.builtin.command:
-    cmd: "/usr/bin/postgresql-setup --initdb"
+    cmd: "postgresql-setup --initdb"
     creates: "{{ postgres_config_dir }}"
   become: true
   become_user: "{{ postgres_admin_user }}"
