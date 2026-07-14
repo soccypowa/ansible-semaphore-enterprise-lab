@@ -19,28 +19,27 @@
   become_user: "{{ postgres_admin_user }}"
   when: ansible_os_family == "RedHat"
 
-- name: Check if PostgreSQL cluster already exists (Ubuntu)
+- name: Drop the default cluster (Ubuntu)
   ansible.builtin.command:
-    cmd: pg_lsclusters -h
-  register: postgres_cluster_list
-  changed_when: false
+    cmd: "pg_dropcluster {{ postgres_version }} main --stop"
+  args:
+    removes: "{{ postgres_config_dir }}/PG_VERSION"
+  become: true
+  become_user: "{{ postgres_admin_user }}"
   when: ansible_os_family == "Debian"
-
-- name: Drop the default cluster if locale is wrong (Ubuntu)
-  ansible.builtin.command:
-    cmd: "pg_dropcluster --stop {{ postgres_version }} main"
-  when:
-    - ansible_os_family == "Debian"
-    - postgres_cluster_list.stdout | length > 0
-    - "'en_US' not in postgres_cluster_list.stdout"
+  notify: Reload PostgreSQL
 
 - name: Initialise the database cluster with correct locale (Ubuntu)
   ansible.builtin.command:
-    cmd: "pg_createcluster --locale {{ postgres_initdb_locale }} {{ postgres_version }} main"
+    cmd: >
+      pg_createcluster
+      --locale {{ postgres_initdb_locale }}
+      {{ postgres_version }} main
   args:
     creates: "{{ postgres_config_dir }}/PG_VERSION"
-  when:
-    - ansible_os_family == "Debian"
+  become: true
+  become_user: "{{ postgres_admin_user }}"
+  when: ansible_os_family == "Debian"
 
 - name: Ensure PostgreSQL service is enabled and running
   ansible.builtin.service:
