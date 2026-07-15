@@ -1,0 +1,113 @@
+---
+- name: Update all packages (Debian/Ubuntu)
+  ansible.builtin.apt:
+    upgrade: dist
+    update_cache: true
+    cache_valid_time: 3600
+  when:
+    - ansible_os_family == "Debian"
+    - patching_update_type == "all"
+
+- name: Security updates only (Debian/Ubuntu)
+  ansible.builtin.apt:
+    upgrade: dist
+    update_cache: true
+    cache_valid_time: 3600
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+    UNATTENDED_ONLY: "1"
+  when:
+    - ansible_os_family == "Debian"
+    - patching_update_type == "security"
+
+- name: Update all packages (RHEL)
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+    update_only: true
+  when:
+    - ansible_os_family == "RedHat"
+    - patching_update_type == "all"
+
+- name: Security updates only (RHEL)
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+    security: true
+    update_only: true
+  when:
+    - ansible_os_family == "RedHat"
+    - patching_update_type == "security"
+
+- name: Update all packages (openSuse)
+  community.general.zypper:
+    name: "*"
+    state: latest
+    update_cache: true
+  when:
+    - ansible_os_family == "Suse"
+    - patching_update_type == "all"
+
+- name: Security updates only (openSuse)
+  community.general.zypper:
+    name: "*"
+    state: latest
+    update_cache: true
+    type: patch
+  when:
+    - ansible_os_family == "Suse"
+    - patching_update_type == "security"
+
+- name: Check if reboot is required (Debian/Buntu)
+  ansible.builtin.stat:
+    path: /var/run/reboot-required
+  register: patching_reboot_required_ubuntu
+  when: ansible_os_family == "Debian"
+
+- name: Check if reboot is required (RHEL)
+  ansible.builtin.command:
+    cmd: needs-restarting -r
+  register: patching_reboot_required_rhel
+  changed_when: false
+  failed_when: false
+  when: ansible_os_family == "RedHat"
+
+- name: Check if reboot is required (openSuse)
+  ansible.builtin.command:
+    cmd: zypper ps -s
+  register: patching_reboot_required_suse
+  changed_when: false
+  failed_when: false
+  when: ansible_os_family == "Suse"
+
+- name: Reboot if required (Debian/Ubuntu)
+  ansible.builtin.reboot:
+    reboot_timeout: "{{ patching_reboot_timeout }}"
+    msg: "Rebooting after package updates"
+  when:
+    - ansible_os_family == "Debian"
+    - patching_reboot_if_required | bool
+    - patching_reboot_required_ubuntu.stat.exists | default(false)
+
+- name: Reboot if required (RHEL)
+  ansible.builtin.reboot:
+    reboot_timeout: "{{ patching_reboot_timeout }}"
+    msg: "Rebooting after package updates"
+  when:
+    - ansible_os_family == "RedHat"
+    - patching_reboot_if_required | bool
+    - patching_reboot_required_rhel.rc | default(0) == 1
+
+- name: Reboot if required (openSuse)
+  ansible.builtin.reboot:
+    reboot_timeout: "{{ patching_reboot_timeout }}"
+    msg: "Rebooting after package updates"
+  when:
+    - ansible_os_family == "Suse"
+    - patching_reboot_if_required | bool
+    - "'processes using deleted files' in reboot_required_suse.stdout"
+
+- name: Verify host is reachable after reboot
+  ansible.builtin.wait_for_connection:
+    timeout: "{{ patching_reboot_timeout }}"
+  when: patching_reboot_if_required | bool

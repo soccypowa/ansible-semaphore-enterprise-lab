@@ -1,0 +1,18 @@
+---
+# Run against all hosts by default, or a subset via target_hosts.
+# The update type (all packages vs security only) is controlled by
+# patching_update_type -- expose both as survey variables in Semaphore
+# so operators can make the right call at runtime without editing YAML.
+#
+# IMPORTANT: this playbook uses `serial: 1` -- it patches one host at
+# a time and waits for it to come back before moving to the next. This
+# prevents a bad update from taking down all hosts simultaneously.
+# Remove serial or increase it only if you have a load balancer and
+# have tested your application's behaviour during rolling restarts.
+
+- name: Patch managed nodes
+  hosts: "{{ taget_hosts | default('managed_nodes') }}"
+  become: true
+  serial: 1
+  roles:
+    - role: patching

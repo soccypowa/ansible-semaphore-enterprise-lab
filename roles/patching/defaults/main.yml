@@ -1,0 +1,13 @@
+---
+# Whether to reboot after updates if the OS signals it is needed.
+# Safe to leave true for most cases -- the role only reboots if the OS
+# actually requires it, not on every run.
+patching_reboot_if_required: true
+
+# How long to wait for the host to come back after a reboot before
+# declaring the run failed.
+patching_reboot_timeout: 300
+
+# Whether to update all packages or just security patches.
+# "all" or "security"
+patching_update_type: "all"
