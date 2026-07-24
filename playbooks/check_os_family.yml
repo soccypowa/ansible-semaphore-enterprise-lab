@@ -1,0 +1,13 @@
+# show-os-family.yml - Display OS family information
+---
+- name: Show OS family
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Display OS family and related facts
+      ansible.builtin.debug:
+        msg:
+          - "OS Family: {{ ansible_os_family }}"
+          - "Distribution: {{ ansible_distribution }}"
+          - "Distribution Version: {{ ansible_distribution_version }}"
+          - "Distribution Major Version: {{ ansible_distribution_major_version }}"
