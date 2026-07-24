@@ -52,23 +52,23 @@
     name: "{{ postgres_service }}"
     enabled: true
     state: started
-# - name: Set listen_addresses in postgreslq.conf
-#   ansible.builtin.lineinfile:
-#     path: "{{ postgres_conf_file }}"
-#     regexp: "^#?listen_addresses"
-#     line: "listen_addresses = {{ postgres_listen_addresses }}"
-#     state: present
-#   notify: Restart PostgreSQL
 
-# - name: Configure pg_hba.conf (client auth)
-#   ansible.builtin.template:
-#     src: pg_hba.conf.j2
-#     dest: "{{ postgres_hba_file }}"
-#     owner: postgres
-#     group: postgres
-#     mode: "0640"
-#   notify: Reload PostgreSQL
+- name: Set listen_addresses in postgresql.conf
+  ansible.builtin.lineinfile:
+    path: "{{ postgres_conf_file }}"
+    regexp: "^#?listen_addresses"
+    line: "listen_addresses = {{ postgres_listen_addresses }}"
+    state: present
+  notify: Restart PostgreSQL
 
+- name: Configure pg_hba.conf (client auth)
+  ansible.builtin.template:
+    src: pg_hba.conf.j2
+    dest: "{{ postgres_hba_file }}"
+    owner: postgres
+    group: postgres
+    mode: "0640"
+  notify: Reload PostgreSQL
 # - name: Create application databases
 #   community.general.postgresql_db:
 #     name: "{{ item.name }}"

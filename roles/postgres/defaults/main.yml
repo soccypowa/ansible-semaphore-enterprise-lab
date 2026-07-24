@@ -11,7 +11,7 @@ postgres_service: "postgresql@{{ postgres_version }}-main"
 postgres_language_pack: language-pack-en
 postgres_initdb_locale: en_US.utf8
 postgres_config_dir: "/etc/postgresql/{{ postgres_version }}/main"
-postgres_conf_file: "/etc/postgresql/{{ postgres_version }}/main/postgresql.conf"
-postgres_hba_file: "/etc/postgresql/{{ postgres_version }}/main/pg_hba.conf"
+postgres_conf_file: "{{ postgres_config_dir }}/postgresql.conf"
+postgres_hba_file: "{{ postgres_config_dir }}/pg_hba.conf"
 postgres_admin_user: postgres
-postgres_listen_addresses: "'*'"
+postgres_listen_addresses: "'localhost,{{ ansible_default_ipv4.address }}'"

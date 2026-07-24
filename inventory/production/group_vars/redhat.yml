@@ -10,9 +10,8 @@ postgres_packages:
 postgres_service: postgresql-{{ postgres_version }}
 postgres_language_pack: glibc-langpack-en
 postgres_config_dir: /var/lib/pgsql/{{ postgres_version }}/data
-# postgres_conf_file: /var/lib/pgsql/data/postgresql.conf
-# postgres_hba_file: /var/lib/pgsql/data/pg_hba.conf
-
+postgres_conf_file: "{{ postgres_config_dir }}/postgresql.conf"
+postgres_hba_file: "{{ postgres_config_dir }}/pg_hba.conf"
 postgres_pgdg_repo_url: >-
   https://download.postgresql.org/pub/repos/yum/reporpms/EL-{{ ansible_distribution_major_version }}-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 
