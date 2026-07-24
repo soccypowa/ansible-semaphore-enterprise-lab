@@ -69,43 +69,44 @@
     group: postgres
     mode: "0640"
   notify: Reload PostgreSQL
-# - name: Create application databases
-#   community.general.postgresql_db:
-#     name: "{{ item.name }}"
-#     encoding: "{{ item.encoding | default('UTF8') }}"
-#     lc_collate: "{{ item.lc_collate | default('en_US.utf8') }}"
-#     lc_ctype: "{{ item.lc_ctype | default('en_US.utf8') }}"
-#     state: present
-#   loop: "{{ postgres_databases }}"
-#   loop_control:
-#     label: "{{ item.name }}"
-#   become: true
-#   become_user: "{{ postgres_admin_user }}"
 
-# - name: Create database users
-#   community.postgresql.postgresql_user:
-#     name: "{{ item.name }}"
-#     password: "{{ item.password }}"
-#     state: present
-#   loop: "{{ postgres_users }}"
-#   loop_control:
-#     label: "{{ item.name }}"
-#   become: true
-#   become_user: "{{ postgres_admin_user }}"
-#   no_log: true # never print passwords in task output or Semaphore logs
+- name: Create application databases
+  community.general.postgresql_db:
+    name: "{{ item.name }}"
+    encoding: "{{ item.encoding | default('UTF8') }}"
+    lc_collate: "{{ item.lc_collate | default('en_US.utf8') }}"
+    lc_ctype: "{{ item.lc_ctype | default('en_US.utf8') }}"
+    state: present
+  loop: "{{ postgres_databases }}"
+  loop_control:
+    label: "{{ item.name }}"
+  become: true
+  become_user: "{{ postgres_admin_user }}"
 
-# - name: Grant database privileges to users
-#   community.general.postgresql_privs:
-#     database: "{{ priv_item.1 }}"
-#     roles: "{{ priv_item.0.name }}"
-#     privs: "{{ priv_item.0.privs }}"
-#     type: database
-#     state: present
-#   # flatten user+database combination into one loop
-#   loop: "{{ postgres_users | subelements('databases') }}"
-#   loop_control:
-#     loop_var: priv_item
-#     label: "{{ priv_item.0.name }} -> {{ priv_item.1 }}"
-#   become: true
-#   become_user: "{{ postgres_admin_user }}"
-#   no_log: true
+- name: Create database users
+  community.postgresql.postgresql_user:
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+    state: present
+  loop: "{{ postgres_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+  become: true
+  become_user: "{{ postgres_admin_user }}"
+  no_log: true # never print passwords in task output or Semaphore logs
+
+- name: Grant database privileges to users
+  community.general.postgresql_privs:
+    database: "{{ priv_item.1 }}"
+    roles: "{{ priv_item.0.name }}"
+    privs: "{{ priv_item.0.privs }}"
+    type: database
+    state: present
+  # flatten user+database combination into one loop
+  loop: "{{ postgres_users | subelements('databases') }}"
+  loop_control:
+    loop_var: priv_item
+    label: "{{ priv_item.0.name }} -> {{ priv_item.1 }}"
+  become: true
+  become_user: "{{ postgres_admin_user }}"
+  no_log: true
