@@ -22,16 +22,11 @@
   ansible.builtin.package:
     name: "{{ postgres_packages }}"
     state: present
-# - name: Ensure English locale is installed
-#   ansible.builtin.package:
-#     name: "{{ postgres_language_pack }}"
-#     state: present
 
-# - name: Install PostgreSQL packages
-#   ansible.builtin.package:
-#     name: "{{ postgres_packages }}"
-#     state: present
-
+- name: Ensure English locale is installed
+  ansible.builtin.package:
+    name: "{{ postgres_language_pack }}"
+    state: present
 # - name: Initialise the database cluster (RHEL only)
 #   ansible.builtin.command:
 #     cmd: /usr/bin/postgresql-setup --initdb
@@ -41,16 +36,6 @@
 #   become: true
 #   become_user: "{{ postgres_admin_user }}"
 #   when: ansible_os_family == "RedHat"
-
-# - name: Drop the default cluster (Ubuntu)
-#   ansible.builtin.command:
-#     cmd: "pg_dropcluster {{ postgres_version }} main --stop"
-#   args:
-#     removes: "{{ postgres_config_dir }}/PG_VERSION"
-#   become: true
-#   become_user: "{{ postgres_admin_user }}"
-#   when: ansible_os_family == "Debian"
-#   notify: Reload PostgreSQL
 
 # - name: Initialise the database cluster with correct locale (Ubuntu)
 #   ansible.builtin.command:
