@@ -3,6 +3,21 @@
   ansible.builtin.import_tasks:
     file: repo.yml
 
+- name: Install postgresql-common framework (Debian/Ubuntu)
+  ansible.builtin.apt:
+    name: postgresql-common
+    state: present
+    update_cache: true
+  when: ansible_os_family == "Debian"
+
+- name: Disable automatic cluster creation (Debian/Ubuntu)
+  ansible.builtin.lineinfile:
+    path: /etc/postgresql-common/createcluster.conf
+    regexp: '^#?create_main_cluster\s*='
+    line: "create_main_cluster = false"
+    state: present
+  when: ansible_os_family == "Debian"
+
 - name: Install PostgreSQL packages
   ansible.builtin.package:
     name: "{{ postgres_packages }}"
