@@ -34,8 +34,6 @@
     creates: "{{ postgres_config_dir }}/PG_VERSION"
   environment:
     PGSETUP_INITDB_OPTIONS: "--locale={{ postgres_initdb_locale }}"
-  become: true
-  become_user: "{{ postgres_admin_user }}"
   when: ansible_os_family == "RedHat"
 
 - name: Initialise the database cluster (Ubuntu)
