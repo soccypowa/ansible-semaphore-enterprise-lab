@@ -4,14 +4,18 @@ webserver_docroot: /usr/share/nginx/html
 webserver_firewall_backend: firewalld
 sshd_sftp_subsystem: /usr/lib/openssh/sftp-server
 postgres_packages:
-  - postgresql-server
-  - postgresql-contrib
+  - postgresql{{ postgres_version }}-server
+  - postgresql{{ postgres_version }}-contrib
   - python3-psycopg2
-postgres_service: postgres
-postgres_language_pack: glibc-langpack-en
-postgres_config_dir: /var/lib/pgsql/data
-postgres_conf_file: /var/lib/pgsql/data/postgresql.conf
-postgres_hba_file: /var/lib/pgsql/data/pg_hba.conf
+# postgres_service: postgres
+# postgres_language_pack: glibc-langpack-en
+# postgres_config_dir: /var/lib/pgsql/data
+# postgres_conf_file: /var/lib/pgsql/data/postgresql.conf
+# postgres_hba_file: /var/lib/pgsql/data/pg_hba.conf
+
+postgres_pgdg_repo_url: >-
+  https://download.postgresql.org/pub/repos/yum/reporpms/
+  EL-{{ ansible_distribution_major_version }}-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 
 rhsm_auth_method: activation_key
 rhsm_org_id: "{{ vault_rhsm_org_id }}"

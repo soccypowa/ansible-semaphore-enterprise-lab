@@ -13,3 +13,5 @@ webserver_docroot: /srv/www/htdocs
 webserver_firewall_backend: firewalld
 
 sshd_sftp_subsystem: /usr/lib/ssh/sftp-server
+
+postgres_pgdg_repo_url: "https://download.postgresql.org/pub/repos/zypp/repo/pgdg-openSUSE-{{ ansible_distribution_major_version }}-x86_64.repo"

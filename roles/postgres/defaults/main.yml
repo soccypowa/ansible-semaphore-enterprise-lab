@@ -4,7 +4,7 @@ postgres_databases: []
 postgres_users: []
 postgres_allowed_hosts: []
 postgres_packages:
-  - postgresql
+  - postgresql-{{ postgres_version }}
   - postgresql-contrib
   - python3-psycopg2
 postgres_service: "postgresql@{{ postgres_version }}-main"

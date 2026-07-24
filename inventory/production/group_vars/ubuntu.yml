@@ -3,3 +3,6 @@ admin_users_sudo_group: sudo
 webserver_docroot: /var/www/html
 webserver_firewall_backend: ufw
 sshd_sftp_subsystem: /usr/lib/openssh/sftp-server
+
+postgres_pgdg_repo_url: "https://apt.postgresql.org/pub/repos/apt"
+postgres_pgdg_key_url: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"

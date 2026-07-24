@@ -1,0 +1,55 @@
+---
+# Ubuntu/Debian -- add the PGDG apt repository
+- name: Install prereqs for apt over HTTPS (Debian/Ubuntu)
+  ansible.builtin.apt:
+    name:
+      - curl
+      - gnupg2
+      - apt-transport-https
+    state: present
+    update_cache: true
+  when: ansible_os_family == "Debian"
+
+- name: Add PGDG signing key (Debian/Ubuntu)
+  ansible.builtin.get_url:
+    url: "{{ postgres_pgdg_key_url }}"
+    dest: /var/share/keyrings/gpdg.asc
+    mode: "0644"
+    force: false
+  when: ansible_os_family == "Debian"
+
+- name: Add the PGDG repository (Debian/Ubuntu)
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [signed-by=/usr/share/keyrings/pgdg.asc]
+      {{ postgres_pgdg_repo_url }}
+      {{ ansible_distribution_release }}-pgdg main
+    filename: pgdg
+    state: present
+    update_cache: true
+  when: ansible_os_family == "Debian"
+
+# RHEL -- add the PGDG rpm repository
+- name: Disable builtin postgresql module (RHEL 8/9)
+  ansible.builtin.command:
+    cmd: dnf module disable postgresql -y
+  changed_when: false
+  when:
+    - ansible_os_family == "Redhat"
+    - ansible_distribution_major_version | int <= 9
+
+- name: Install PGDG rpository (RHEL)
+  ansible.builtin.dnf:
+    name: "{{ postgres_pgdg_repo_url }}"
+    state: present
+    disable_gpg_check: false
+  when: ansible_os_family == "Redhat"
+
+# openSUSE -- add the PGDG zypper repository
+- name: Add PGDG repository (OpenSuse)
+  community.general.zypper_repository:
+    name: pgdg
+    repo: "{{ postgres_pgdg_repo_url }}"
+    state: present
+    auto_import_keys: true
+  when: ansible_os_family == "Suse"

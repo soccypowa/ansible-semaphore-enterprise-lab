@@ -1,106 +1,114 @@
 ---
-- name: Ensure English locale is installed
-  ansible.builtin.package:
-    name: "{{ postgres_language_pack }}"
-    state: present
+- name: Setup official PostgreSQL repository
+  ansible.builtin.import_tasks:
+    file: repo.yml
 
 - name: Install PostgreSQL packages
   ansible.builtin.package:
     name: "{{ postgres_packages }}"
     state: present
+# - name: Ensure English locale is installed
+#   ansible.builtin.package:
+#     name: "{{ postgres_language_pack }}"
+#     state: present
 
-- name: Initialise the database cluster (RHEL only)
-  ansible.builtin.command:
-    cmd: /usr/bin/postgresql-setup --initdb
-    creates: "{{ postgres_config_dir }}/PG_VERSION"
-  environment:
-    PGSETUP_INITDB_OPTIONS: "--locale={{ postgres_initdb_locale }}"
-  become: true
-  become_user: "{{ postgres_admin_user }}"
-  when: ansible_os_family == "RedHat"
+# - name: Install PostgreSQL packages
+#   ansible.builtin.package:
+#     name: "{{ postgres_packages }}"
+#     state: present
 
-- name: Drop the default cluster (Ubuntu)
-  ansible.builtin.command:
-    cmd: "pg_dropcluster {{ postgres_version }} main --stop"
-  args:
-    removes: "{{ postgres_config_dir }}/PG_VERSION"
-  become: true
-  become_user: "{{ postgres_admin_user }}"
-  when: ansible_os_family == "Debian"
-  notify: Reload PostgreSQL
+# - name: Initialise the database cluster (RHEL only)
+#   ansible.builtin.command:
+#     cmd: /usr/bin/postgresql-setup --initdb
+#     creates: "{{ postgres_config_dir }}/PG_VERSION"
+#   environment:
+#     PGSETUP_INITDB_OPTIONS: "--locale={{ postgres_initdb_locale }}"
+#   become: true
+#   become_user: "{{ postgres_admin_user }}"
+#   when: ansible_os_family == "RedHat"
 
-- name: Initialise the database cluster with correct locale (Ubuntu)
-  ansible.builtin.command:
-    cmd: >
-      pg_createcluster
-      --locale {{ postgres_initdb_locale }}
-      {{ postgres_version }} main
-  args:
-    creates: "{{ postgres_config_dir }}/PG_VERSION"
-  become: true
-  become_user: "{{ postgres_admin_user }}"
-  when: ansible_os_family == "Debian"
+# - name: Drop the default cluster (Ubuntu)
+#   ansible.builtin.command:
+#     cmd: "pg_dropcluster {{ postgres_version }} main --stop"
+#   args:
+#     removes: "{{ postgres_config_dir }}/PG_VERSION"
+#   become: true
+#   become_user: "{{ postgres_admin_user }}"
+#   when: ansible_os_family == "Debian"
+#   notify: Reload PostgreSQL
 
-- name: Ensure PostgreSQL service is enabled and running
-  ansible.builtin.service:
-    name: "{{ postgres_service }}"
-    enabled: true
-    state: started
+# - name: Initialise the database cluster with correct locale (Ubuntu)
+#   ansible.builtin.command:
+#     cmd: >
+#       pg_createcluster
+#       --locale {{ postgres_initdb_locale }}
+#       {{ postgres_version }} main
+#   args:
+#     creates: "{{ postgres_config_dir }}/PG_VERSION"
+#   become: true
+#   become_user: "{{ postgres_admin_user }}"
+#   when: ansible_os_family == "Debian"
 
-- name: Set listen_addresses in postgreslq.conf
-  ansible.builtin.lineinfile:
-    path: "{{ postgres_conf_file }}"
-    regexp: "^#?listen_addresses"
-    line: "listen_addresses = {{ postgres_listen_addresses }}"
-    state: present
-  notify: Restart PostgreSQL
+# - name: Ensure PostgreSQL service is enabled and running
+#   ansible.builtin.service:
+#     name: "{{ postgres_service }}"
+#     enabled: true
+#     state: started
 
-- name: Configure pg_hba.conf (client auth)
-  ansible.builtin.template:
-    src: pg_hba.conf.j2
-    dest: "{{ postgres_hba_file }}"
-    owner: postgres
-    group: postgres
-    mode: "0640"
-  notify: Reload PostgreSQL
+# - name: Set listen_addresses in postgreslq.conf
+#   ansible.builtin.lineinfile:
+#     path: "{{ postgres_conf_file }}"
+#     regexp: "^#?listen_addresses"
+#     line: "listen_addresses = {{ postgres_listen_addresses }}"
+#     state: present
+#   notify: Restart PostgreSQL
 
-- name: Create application databases
-  community.general.postgresql_db:
-    name: "{{ item.name }}"
-    encoding: "{{ item.encoding | default('UTF8') }}"
-    lc_collate: "{{ item.lc_collate | default('en_US.utf8') }}"
-    lc_ctype: "{{ item.lc_ctype | default('en_US.utf8') }}"
-    state: present
-  loop: "{{ postgres_databases }}"
-  loop_control:
-    label: "{{ item.name }}"
-  become: true
-  become_user: "{{ postgres_admin_user }}"
+# - name: Configure pg_hba.conf (client auth)
+#   ansible.builtin.template:
+#     src: pg_hba.conf.j2
+#     dest: "{{ postgres_hba_file }}"
+#     owner: postgres
+#     group: postgres
+#     mode: "0640"
+#   notify: Reload PostgreSQL
 
-- name: Create database users
-  community.postgresql.postgresql_user:
-    name: "{{ item.name }}"
-    password: "{{ item.password }}"
-    state: present
-  loop: "{{ postgres_users }}"
-  loop_control:
-    label: "{{ item.name }}"
-  become: true
-  become_user: "{{ postgres_admin_user }}"
-  no_log: true # never print passwords in task output or Semaphore logs
+# - name: Create application databases
+#   community.general.postgresql_db:
+#     name: "{{ item.name }}"
+#     encoding: "{{ item.encoding | default('UTF8') }}"
+#     lc_collate: "{{ item.lc_collate | default('en_US.utf8') }}"
+#     lc_ctype: "{{ item.lc_ctype | default('en_US.utf8') }}"
+#     state: present
+#   loop: "{{ postgres_databases }}"
+#   loop_control:
+#     label: "{{ item.name }}"
+#   become: true
+#   become_user: "{{ postgres_admin_user }}"
 
-- name: Grant database privileges to users
-  community.general.postgresql_privs:
-    database: "{{ priv_item.1 }}"
-    roles: "{{ priv_item.0.name }}"
-    privs: "{{ priv_item.0.privs }}"
-    type: database
-    state: present
-  # flatten user+database combination into one loop
-  loop: "{{ postgres_users | subelements('databases') }}"
-  loop_control:
-    loop_var: priv_item
-    label: "{{ priv_item.0.name }} -> {{ priv_item.1 }}"
-  become: true
-  become_user: "{{ postgres_admin_user }}"
-  no_log: true
+# - name: Create database users
+#   community.postgresql.postgresql_user:
+#     name: "{{ item.name }}"
+#     password: "{{ item.password }}"
+#     state: present
+#   loop: "{{ postgres_users }}"
+#   loop_control:
+#     label: "{{ item.name }}"
+#   become: true
+#   become_user: "{{ postgres_admin_user }}"
+#   no_log: true # never print passwords in task output or Semaphore logs
+
+# - name: Grant database privileges to users
+#   community.general.postgresql_privs:
+#     database: "{{ priv_item.1 }}"
+#     roles: "{{ priv_item.0.name }}"
+#     privs: "{{ priv_item.0.privs }}"
+#     type: database
+#     state: present
+#   # flatten user+database combination into one loop
+#   loop: "{{ postgres_users | subelements('databases') }}"
+#   loop_control:
+#     loop_var: priv_item
+#     label: "{{ priv_item.0.name }} -> {{ priv_item.1 }}"
+#   become: true
+#   become_user: "{{ postgres_admin_user }}"
+#   no_log: true
