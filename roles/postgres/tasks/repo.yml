@@ -13,7 +13,7 @@
 - name: Add PGDG signing key (Debian/Ubuntu)
   ansible.builtin.get_url:
     url: "{{ postgres_pgdg_key_url }}"
-    dest: /var/share/keyrings/gpdg.asc
+    dest: /usr/share/keyrings/gpdg.asc
     mode: "0644"
     force: false
   when: ansible_os_family == "Debian"
@@ -35,7 +35,7 @@
     cmd: dnf module disable postgresql -y
   changed_when: false
   when:
-    - ansible_os_family == "Redhat"
+    - ansible_os_family == "RedHat"
     - ansible_distribution_major_version | int <= 9
 
 - name: Install PGDG rpository (RHEL)
@@ -43,7 +43,7 @@
     name: "{{ postgres_pgdg_repo_url }}"
     state: present
     disable_gpg_check: false
-  when: ansible_os_family == "Redhat"
+  when: ansible_os_family == "RedHat"
 
 # openSUSE -- add the PGDG zypper repository
 - name: Add PGDG repository (OpenSuse)
