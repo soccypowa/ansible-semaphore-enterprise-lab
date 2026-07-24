@@ -10,45 +10,43 @@
     update_cache: true
   when: ansible_os_family == "Debian"
 
-- name: Create apt keyrings directory (Debian/Ubuntu)
-  ansible.builtin.file:
-    path: /usr/share/keyrings
-    state: directory
-    owner: root
-    group: root
-    mode: "0755"
-  when: ansible_os_family == "Debian"
-
-- name: Download PGDG signing key (Debian/Ubuntu)
+- name: Add PGDG signing key (Debian/Ubuntu)
   ansible.builtin.get_url:
     url: "{{ postgres_pgdg_key_url }}"
-    dest: /tmp/pgdg.asc
+    dest: /usr/share/keyrings/pgdg.asc
     mode: "0644"
-    force: true
-  when: ansible_os_family == "Debian"
-
-- name: Dearmor and install PGDG signing key (Debian/Ubuntu)
-  ansible.builtin.shell:
-    cmd: gpg --dearmor < /tmp/pgdg.asc > /usr/share/keyrings/pgdg.gpg
-    creates: /usr/share/keyrings/pgdg.gpg
-  when: ansible_os_family == "Debian"
-
-- name: Clean up temporary key file (Debian/Ubuntu)
-  ansible.builtin.file:
-    path: /tmp/pgdg.asc
-    state: absent
+    force: false
   when: ansible_os_family == "Debian"
 
 - name: Add PGDG apt repository (Debian/Ubuntu)
   ansible.builtin.apt_repository:
     repo: >-
-      deb [signed-by=/usr/share/keyrings/pgdg.gpg]
+      deb [signed-by=/usr/share/keyrings/pgdg.asc]
       {{ postgres_pgdg_repo_url }}
       {{ ansible_distribution_release }}-pgdg main
     filename: pgdg
     state: present
     update_cache: true
   when: ansible_os_family == "Debian"
+
+# - name: Download and install PGDG signing key (Debian/Ubuntu)
+#   ansible.builtin.shell:
+#     cmd: >-
+#       curl -fsSL {{ postgres_pgdg_key_url }} |
+#       gpg --dearmor -o /usr/share/keyrings/pgdg.gpg
+#     creates: /usr/share/keyrings/pgdg.gpg
+#   when: ansible_os_family == "Debian"
+
+# - name: Add PGDG apt repository (Debian/Ubuntu)
+#   ansible.builtin.apt_repository:
+#     repo: >-
+#       deb [signed-by=/usr/share/keyrings/pgdg.gpg]
+#       {{ postgres_pgdg_repo_url }}
+#       {{ ansible_distribution_release }}-pgdg main
+#     filename: pgdg
+#     state: present
+#     update_cache: true
+#   when: ansible_os_family == "Debian"
 
 # RHEL -- add the PGDG rpm repository
 - name: Disable builtin postgresql module (RHEL 8/9)
