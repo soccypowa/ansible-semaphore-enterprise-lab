@@ -14,8 +14,7 @@ postgres_packages:
 # postgres_hba_file: /var/lib/pgsql/data/pg_hba.conf
 
 postgres_pgdg_repo_url: >-
-  https://download.postgresql.org/pub/repos/yum/reporpms/
-  EL-{{ ansible_distribution_major_version }}-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+  https://download.postgresql.org/pub/repos/yum/reporpms/EL-{{ ansible_distribution_major_version }}-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 
 rhsm_auth_method: activation_key
 rhsm_org_id: "{{ vault_rhsm_org_id }}"
