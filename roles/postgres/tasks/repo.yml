@@ -29,6 +29,7 @@
     update_cache: true
   when: ansible_os_family == "Debian"
 
+# TODO: Clean up here
 # - name: Download and install PGDG signing key (Debian/Ubuntu)
 #   ansible.builtin.shell:
 #     cmd: >-
@@ -56,6 +57,12 @@
   when:
     - ansible_os_family == "RedHat"
     - ansible_distribution_major_version | int <= 9
+
+- name: Import PGDG GPG key (RHEL)
+  ansible.builtin.rpm_key:
+    key: "https://download.postgresql.org/pub/repos/yum/keys/PGDG-RPM-GPG-KEY-RHEL"
+    state: present
+  when: ansible_os_family == "RedHat"
 
 - name: Install PGDG rpository (RHEL)
   ansible.builtin.dnf:
