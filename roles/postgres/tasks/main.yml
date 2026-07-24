@@ -47,15 +47,13 @@
       --locale {{ postgres_initdb_locale }}
   args:
     creates: "/var/lib/postgresql/{{ postgres_version }}/main/PG_VERSION"
-  # become: true
-  # become_user: "{{ postgres_admin_user }}"
   when: ansible_os_family == "Debian"
-# - name: Ensure PostgreSQL service is enabled and running
-#   ansible.builtin.service:
-#     name: "{{ postgres_service }}"
-#     enabled: true
-#     state: started
 
+- name: Ensure PostgreSQL service is enabled and running
+  ansible.builtin.service:
+    name: "{{ postgres_service }}"
+    enabled: true
+    state: started
 # - name: Set listen_addresses in postgreslq.conf
 #   ansible.builtin.lineinfile:
 #     path: "{{ postgres_conf_file }}"
